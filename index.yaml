@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  opencost:
+  - apiVersion: v2
+    created: "2023-01-23T21:48:33.0047004+05:30"
+    description: OpenCost helm chart
+    digest: db0d5eb57be62b29225a2c198a86e91f1616b3222c7c552f2cd362030816e110
+    maintainers:
+    - name: truefoundry
+    name: opencost
+    urls:
+    - https://github.com/niranshi04/test-helm/opencost-0.0.1.tgz
+    version: 0.0.1
+generated: "2023-01-23T21:48:33.0012164+05:30"

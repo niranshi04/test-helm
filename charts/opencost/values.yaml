@@ -1,0 +1,54 @@
+fullnameOverride: ""
+nameOverride: ""
+annotations: {}
+autoscaling:
+  enabled: false
+  replicaCount: 1
+podAnnotations: {}
+nodeSelector: {}
+tolerations: {}
+affinity: {}
+
+modelImage:
+  repository: "quay.io/kubecost1/kubecost-cost-model"
+  tag: latest
+  pullPolicy: Always
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "55M"
+    limits:
+      cpu: "999m"
+      memory: "1G"
+
+uiImage:
+  repository: "quay.io/kubecost1/opencost-ui"
+  tag: latest
+  pullPolicy: Always
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "55M"
+    limits:
+      cpu: "999m"
+      memory: "1G"
+
+env:
+    # The endpoint should have the form http://<service-name>.<namespace-name>.svc
+  - name: PROMETHEUS_SERVER_ENDPOINT
+    value: "http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090"
+    # The GCP Pricing API requires a key. This is supplied just for evaluation.
+  - name: CLOUD_PROVIDER_API_KEY
+    value: "AIzaSyD29bGxmHAVEOBYtgd8sYM2gM2ekfxQX4U"
+    # Default cluster ID to use if cluster_id is not set in Prometheus metrics.
+  - name: CLUSTER_ID
+    value: "truefoundry"
+
+serviceAccount:
+  name: opencost
+  annotations: {}
+
+service:
+  type: ClusterIP
+  uiPort: 9090
+  port: 9003

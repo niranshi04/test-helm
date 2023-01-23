@@ -1,0 +1,63 @@
+# Create a deployment for a single cost model pod
+#
+# See environment variables if you would like to add a Prometheus for
+# cost model to read from for full functionality.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencost.fullname" . }}
+  labels:
+    {{- include "opencost.labels" . | nindent 4 }}
+    {{- with .Values.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.autoscaling.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "opencost.selectorLabels" . | nindent 6 }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "opencost.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: Always
+      serviceAccountName: {{ include "opencost.name" . }}
+      containers:
+        - image: "{{ .Values.modelImage.repository }}:{{ .Values.modelImage.tag }}"
+          name: {{ .Chart.Name }}
+          resources:
+            {{- toYaml .Values.uiImage.resources | nindent 12 }}
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          imagePullPolicy: {{ .Values.modelImage.pullPolicy }}
+
+        - image: "{{ .Values.uiImage.repository }}:{{ .Values.uiImage.tag }}"
+          name: {{ .Chart.Name }}-ui
+          resources:
+            {{- toYaml .Values.uiImage.resources | nindent 12 }}
+          imagePullPolicy: {{ .Values.uiImage.pullPolicy }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
